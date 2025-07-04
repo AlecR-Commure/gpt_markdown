@@ -188,14 +188,17 @@ class GptMarkdownConfig {
   }
 
   /// A method to get a rich text widget from an inline span.
-  Text getRich(InlineSpan span) {
-    return Text.rich(
-      span,
+  Widget getRich(InlineSpan span) {
+    // SelectableText.rich requires a TextSpan, so wrap if needed
+    final TextSpan textSpan =
+        (span is TextSpan) ? span : TextSpan(children: [span]);
+    return SelectableText.rich(
+      textSpan,
       textDirection: textDirection,
       textScaler: textScaler,
       textAlign: textAlign,
       maxLines: maxLines,
-      overflow: overflow,
+      style: style,
     );
   }
 
@@ -207,18 +210,6 @@ class GptMarkdownConfig {
         maxLines == other.maxLines &&
         overflow == other.overflow &&
         followLinkColor == other.followLinkColor &&
-        // latexWorkaround == other.latexWorkaround &&
-        // components == other.components &&
-        // inlineComponents == other.inlineComponents &&
-        // latexBuilder == other.latexBuilder &&
-        // sourceTagBuilder == other.sourceTagBuilder &&
-        // codeBuilder == other.codeBuilder &&
-        // orderedListBuilder == other.orderedListBuilder &&
-        // unOrderedListBuilder == other.unOrderedListBuilder &&
-        // linkBuilder == other.linkBuilder &&
-        // imageBuilder == other.imageBuilder &&
-        // highlightBuilder == other.highlightBuilder &&
-        // onLinkTap == other.onLinkTap &&
         textDirection == other.textDirection;
   }
 }
