@@ -24,6 +24,7 @@ abstract class MarkdownComponent {
     StrikeMd(),
     BoldMd(),
     ItalicMd(),
+    UnderLineMd(),
     LatexMath(),
     LatexMathMultiLine(),
     HighlightedText(),
@@ -201,14 +202,15 @@ class HTag extends BlockMd {
     var theme = GptMarkdownTheme.of(context);
     var match = this.exp.firstMatch(text.trim());
     var conf = config.copyWith(
-      style: [
-        theme.h1,
-        theme.h2,
-        theme.h3,
-        theme.h4,
-        theme.h5,
-        theme.h6,
-      ][match![1]!.length - 1]?.copyWith(color: config.style?.color),
+      style:
+          [
+            theme.h1,
+            theme.h2,
+            theme.h3,
+            theme.h4,
+            theme.h5,
+            theme.h6,
+          ][match![1]!.length - 1],
     );
     return config.getRich(
       TextSpan(
@@ -426,11 +428,11 @@ class OrderedList extends BlockMd {
     String text,
     final GptMarkdownConfig config,
   ) {
-    var match = this.exp.firstMatch(text.trim());
+    var match = this.exp.firstMatch(text);
 
-    var no = "${match?[1]}";
+    var no = "${match?[1]}".trim();
 
-    var child = MdWidget(context, "${match?[2]?.trim()}", true, config: config);
+    var child = MdWidget(context, "${match?[2]}".trim(), true, config: config);
     return config.orderedListBuilder?.call(
           context,
           no,
@@ -866,6 +868,8 @@ class ATagMd extends InlineMd {
     WidgetSpan? child;
     if (builder != null) {
       child = WidgetSpan(
+        baseline: TextBaseline.alphabetic,
+        alignment: PlaceholderAlignment.baseline,
         child: GestureDetector(
           onTap: () => config.onLinkTap?.call(url, linkText),
           child: builder(
@@ -1057,6 +1061,36 @@ class TableMd extends BlockMd {
       columnAlignments.add(TextAlign.left);
     }
 
+    var tableBuilder = config.tableBuilder;
+
+    if (tableBuilder != null) {
+      var customTable =
+          List<CustomTableRow?>.generate(value.length, (index) {
+            var isHeader = index == 0;
+            var row = value[index];
+            if (row.isEmpty) {
+              return null;
+            }
+            if (index == 1) {
+              return null;
+            }
+            var fields = List<CustomTableField>.generate(maxCol, (index) {
+              var field = row[index];
+              return CustomTableField(
+                data: field ?? "",
+                alignment: columnAlignments[index],
+              );
+            });
+            return CustomTableRow(isHeader: isHeader, fields: fields);
+          }).nonNulls.toList();
+      return tableBuilder(
+        context,
+        customTable,
+        config.style ?? const TextStyle(),
+        config,
+      );
+    }
+
     final controller = ScrollController();
     return Scrollbar(
       controller: controller,
@@ -1157,10 +1191,54 @@ class CodeBlockMd extends BlockMd {
   ) {
     String codes = this.exp.firstMatch(text)?[2] ?? "";
     String name = this.exp.firstMatch(text)?[1] ?? "";
-    codes = codes.replaceAll(r"```", "").trim();
+    codes = codes.replaceAll(r"```", "");
     bool closed = text.endsWith("```");
 
     return config.codeBuilder?.call(context, name, codes, closed) ??
         CodeField(name: name, codes: codes);
   }
+}
+
+class UnderLineMd extends InlineMd {
+  @override
+  RegExp get exp =>
+      RegExp(r"<u>(.*?)(?:</u>|$)", multiLine: true, dotAll: true);
+
+  @override
+  InlineSpan span(
+    BuildContext context,
+    String text,
+    final GptMarkdownConfig config,
+  ) {
+    var match = exp.firstMatch(text.trim());
+    var conf = config.copyWith(
+      style: (config.style ?? const TextStyle()).copyWith(
+        decoration: TextDecoration.underline,
+        decorationColor: config.style?.color,
+      ),
+    );
+    return TextSpan(
+      children: MarkdownComponent.generate(
+        context,
+        "${match?[1]}",
+        conf,
+        false,
+      ),
+      style: conf.style,
+    );
+  }
+}
+
+class CustomTableField {
+  final String data;
+  final TextAlign alignment;
+
+  CustomTableField({required this.data, this.alignment = TextAlign.left});
+}
+
+class CustomTableRow {
+  final bool isHeader;
+  final List<CustomTableField> fields;
+
+  CustomTableRow({this.isHeader = false, required this.fields});
 }

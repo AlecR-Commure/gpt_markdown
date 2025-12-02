@@ -329,6 +329,12 @@ This document was created to test the robustness of Markdown parsers and to ensu
 
   @override
   Widget build(BuildContext context) {
+//     var data = '''|asdfasfd|asdfasf|
+// |---|---|
+// |sohag|asdfasf|
+// |asdfasf|asdfasf|
+// ''';
+
     return GptMarkdownTheme(
       gptThemeData: GptMarkdownTheme.of(context).copyWith(
         highlightColor: Colors.purple,
@@ -411,6 +417,7 @@ This document was created to test the robustness of Markdown parsers and to ensu
                         ListenableBuilder(
                           listenable: _controller,
                           builder: (context, _) {
+                            var data = _controller.text;
                             return Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
@@ -440,7 +447,7 @@ This document was created to test the robustness of Markdown parsers and to ensu
                                 child: Builder(
                                   builder: (context) {
                                     Widget child = GptMarkdown(
-                                      _controller.text,
+                                      data,
                                       textDirection: _direction,
                                       onLinkTap: (url, title) {
                                         debugPrint(url);
@@ -451,9 +458,9 @@ This document was created to test the robustness of Markdown parsers and to ensu
                                       textAlign: TextAlign.justify,
                                       textScaler: const TextScaler.linear(1),
                                       style: const TextStyle(
-                                        fontFamily: 'monospace',
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                          // fontFamily: 'monospace',
+                                          // fontWeight: FontWeight.bold,
+                                          ),
                                       highlightBuilder: (context, text, style) {
                                         return Container(
                                           padding: const EdgeInsets.symmetric(
@@ -614,6 +621,24 @@ This document was created to test the robustness of Markdown parsers and to ensu
                                           ),
                                         );
                                       },
+
+                                      // tableBuilder: (context, tableRows,
+                                      //     textStyle, config) {
+                                      //   return Table(
+                                      //     border: TableBorder.all(
+                                      //       width: 1,
+                                      //       color: Colors.red,
+                                      //     ),
+                                      //     children: tableRows.map((e) {
+                                      //       return TableRow(
+                                      //         children: e.fields.map((e) {
+                                      //           return Text(e.data);
+                                      //         }).toList(),
+                                      //       );
+                                      //     }).toList(),
+                                      //   );
+                                      // },
+
                                       // components: [
                                       //   CodeBlockMd(),
                                       //   NewLines(),

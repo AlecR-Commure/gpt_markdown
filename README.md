@@ -32,7 +32,7 @@ gpt_markdown is a drop-in replacement for flutter_markdown, offering extended su
 | 🔗 Links | ✅ |
 | 📱 Selectable | ✅ |
 | 🧩 Custom components | ✅ |  |
-| 📎 Underline |  | 🔜 |
+| 📎 Underline | ✅ |  |
 
 ## ✨ Key Features
 
@@ -84,6 +84,11 @@ Render a wide variety of content with full Markdown and LaTeX support, including
 - *Italic text*
 ```
 *Italic text*
+```
+
+- <u>Underline text</u>
+```
+<u>Underline text</u>
 ```
 
 - heading texts 

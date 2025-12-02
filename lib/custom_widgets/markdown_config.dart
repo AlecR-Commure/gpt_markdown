@@ -49,6 +49,15 @@ typedef LinkBuilder =
       TextStyle style,
     );
 
+/// A builder function for the table.
+typedef TableBuilder =
+    Widget Function(
+      BuildContext context,
+      List<CustomTableRow> tableRows,
+      TextStyle textStyle,
+      GptMarkdownConfig config,
+    );
+
 /// A builder function for the highlight.
 typedef HighlightBuilder =
     Widget Function(BuildContext context, String text, TextStyle style);
@@ -83,6 +92,7 @@ class GptMarkdownConfig {
     this.overflow,
     this.components,
     this.inlineComponents,
+    this.tableBuilder,
   });
 
   /// The direction of the text.
@@ -142,6 +152,9 @@ class GptMarkdownConfig {
   /// The list of inline components.
   final List<MarkdownComponent>? inlineComponents;
 
+  /// The table builder.
+  final TableBuilder? tableBuilder;
+
   /// A copy of the configuration with the specified parameters.
   GptMarkdownConfig copyWith({
     TextStyle? style,
@@ -163,6 +176,7 @@ class GptMarkdownConfig {
     final UnOrderedListBuilder? unOrderedListBuilder,
     final List<MarkdownComponent>? components,
     final List<MarkdownComponent>? inlineComponents,
+    final TableBuilder? tableBuilder,
   }) {
     return GptMarkdownConfig(
       style: style ?? this.style,
@@ -184,6 +198,7 @@ class GptMarkdownConfig {
       unOrderedListBuilder: unOrderedListBuilder ?? this.unOrderedListBuilder,
       components: components ?? this.components,
       inlineComponents: inlineComponents ?? this.inlineComponents,
+      tableBuilder: tableBuilder ?? this.tableBuilder,
     );
   }
 
